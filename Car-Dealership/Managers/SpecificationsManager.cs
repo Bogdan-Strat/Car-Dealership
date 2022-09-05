@@ -1,4 +1,5 @@
-﻿using Project.Entities;
+using AutoMapper;
+using Project.Entities;
 using Project.Models;
 using Project.Repositories;
 using System;
@@ -11,6 +12,7 @@ namespace Project.Managers
     public class SpecificationsManager : ISpecificationsManager
     {
         private readonly ISpecificationsRepository repo;
+        private readonly IMapper Mapper;
 
         public SpecificationsManager(ISpecificationsRepository repo)
         {
@@ -33,7 +35,8 @@ namespace Project.Managers
             var specifications = repo.GetSpecifications();
 
             var specificationFiltered = specifications.Where(x => x.Model.Colour == "Black")
-                                      .Select(x => new SpecificationsModel { Id = x.Id, Engine = x.Engine })
+                                      //.Select(x => new SpecificationsModel { Id = x.Id, Engine = x.Engine })
+                                      .Select(x => Mapper.Map<Specifications, SpecificationsModel>(x))
                                       .OrderBy(x => x.Id)
                                       .ToList();
             return specificationFiltered;
@@ -41,9 +44,10 @@ namespace Project.Managers
 
         public async Task Update(SpecificationsModel model)
         {
-            var mod = repo.GetSpecifications()
-                         .FirstOrDefault(x => x.Id == model.Id);
-            mod.Engine = model.Engine;
+            //var mod = repo.GetSpecifications()
+            //             .FirstOrDefault(x => x.Id == model.Id);
+            var mod = Mapper.Map<SpecificationsModel, Specifications>(model);
+            //mod.Engine = model.Engine;
 
             await repo.Update(mod);
         }
