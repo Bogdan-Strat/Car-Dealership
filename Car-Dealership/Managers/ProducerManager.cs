@@ -1,4 +1,5 @@
-﻿using Project.Entities;
+using AutoMapper;
+using Project.Entities;
 using Project.Models;
 using Project.Repositories;
 using System;
@@ -11,6 +12,7 @@ namespace Project.Managers
     public class ProducerManager: IProducerManager
     {
         private readonly IProducerRepository repo;
+        private readonly IMapper mapper;
 
         public ProducerManager(IProducerRepository repo)
         {
@@ -30,10 +32,11 @@ namespace Project.Managers
 
         public async Task Update(ProducerModel producerModel)
         {
-            var mod = repo.GetProducers()
-                         .FirstOrDefault(x => x.Id == producerModel.Id);
-            mod.Name = producerModel.Name;
+            //var mod = repo.GetProducers()
+            //             .FirstOrDefault(x => x.Id == producerModel.Id);
+            //mod.Name = producerModel.Name;
 
+            var mod = mapper.Map<ProducerModel, Producer>(producerModel);
             await repo.Update(mod);
         }
 
@@ -42,7 +45,8 @@ namespace Project.Managers
             var producers = repo.GetProducers();
 
             var producerFiltered = producers.Where(x => x.Country == "Black")
-                                      .Select(x => new ProducerModel { Id = x.Id, Name = x.Name })
+                                      //.Select(x => new ProducerModel { Id = x.Id, Name = x.Name })
+                                      .Select(x => mapper.Map<Producer, ProducerModel>(x))
                                       .OrderBy(x => x.Id)
                                       .ToList();
             return producerFiltered;
