@@ -1,4 +1,5 @@
-﻿using Project.Entities;
+using AutoMapper;
+using Project.Entities;
 using Project.Models;
 using Project.Repositories;
 using System;
@@ -11,6 +12,7 @@ namespace Project.Managers
     public class ModelManager:IModelManager
     {
         private readonly IModelRepository repo;
+        private readonly IMapper mapper;
 
         public ModelManager(IModelRepository repository)
         {
@@ -39,7 +41,8 @@ namespace Project.Managers
             var models = repo.GetModels();
 
             var modelsFiltered = models.Where(x => x.Producer.Country == "Germany")
-                                      .Select(x => new ModelSelectedFilter{ Id = x.Id, Name = x.Name })
+                                      //.Select(x => new ModelSelectedFilter{ Id = x.Id, Name = x.Name })
+                                      .Select(x => mapper.Map<Model, ModelSelectedFilter>(x))
                                       .ToList();
             return modelsFiltered;
         }
@@ -65,10 +68,10 @@ namespace Project.Managers
 
         public async Task Update(ModelModel model)
         {
-            var mod = repo.GetModels()
-                         .FirstOrDefault(x => x.Id == model.Id);
-            mod.Name = model.Name;
-
+            //var mod = repo.GetModels()
+            //             .FirstOrDefault(x => x.Id == model.Id);
+            //mod.Name = model.Name;
+            var mod = mapper.Map<ModelModel, Model>(model);
             await repo.Update(mod);
         }
     }
